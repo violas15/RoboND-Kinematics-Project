@@ -5,7 +5,7 @@ import tf
 import random
 
 '''
-Format of test case is [ [[EE position],[EE orientation as quaternions]],[WC location],[joint angles]]
+Format of test case is [ [[EE position],[EE orientation as rpy]],[WC location],[joint angles]]
 You can generate additional test cases by setting up your kuka project and running `$ roslaunch kuka_arm forward_kinematics.launch`
 From here you can adjust the joint angles to find thetas, use the gripper to extract positions and orientation (in quaternion xyzw) and lastly use link 5
 to find the position of the wrist center. These newly generate test cases can be added to the test_cases dictionary
@@ -244,9 +244,7 @@ def test_code(test_case):
     ######### Orientation Calculations
     actualRpy = RrpyCorrected.evalf(subs={alpha:alpha1, beta:beta1, gamma:gamma1})
 
-    # print(actualRpy)
     actualT0_3inv = (T0_3inv.evalf(subs={q1:theta1, q2:theta2, q3:theta3}))
-    # print(actualT0_3inv)
 
     orientationRHS = actualT0_3inv * actualRpy
     print(orientationRHS)
@@ -255,16 +253,8 @@ def test_code(test_case):
     print(orientationRHS.shape)
     for row in range(3):    
         for col in range(3):
-        #print(row*3 + col)
             equations.append(Eq(T3_6[row,col],orientationRHS[row,col]))
-    # equations.append(Eq(T3_6[0,1],orientationRHS[0,1]))
-    # equations.append(Eq(T3_6[0,2],orientationRHS[0,2]))
-    # equations.append(Eq(T3_6[1,0],orientationRHS[1,0]))
-    # equations.append(Eq(T3_6[1,1],orientationRHS[1,1]))
-    # equations.append(Eq(T3_6[1,2],orientationRHS[1,2]))
-    # equations.append(Eq(T3_6[2,0],orientationRHS[2,0]))
-    # equations.append(Eq(T3_6[2,1],orientationRHS[2,1]))
-    # #equations.append(Eq(T3_6[2,2],orientationRHS[2,2]))
+
     print(equations)
     print("solving equations for theta 4-6")
     startt1 = random.random()*6.28 - 3.14
